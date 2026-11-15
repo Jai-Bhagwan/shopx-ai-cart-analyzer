@@ -484,7 +484,8 @@ try:
         col1.metric("Cart Additions", len(analyzed_df))
         col2.metric("Abandoned", len(abandoned_df))
         col3.metric("Drop-Off Rate", f"{(len(abandoned_df) / len(analyzed_df)) * 100:.1f}%")
-        col4.metric("At-Risk Value", f"₹{abandoned_df['Price'].sum():,.0f}")
+        at_risk_millions = abandoned_df['Price'].sum() / 1_000_000
+        col4.metric("At-Risk Value", f"₹{at_risk_millions:.2f}M")
 
         st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
