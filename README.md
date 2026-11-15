@@ -17,4 +17,4 @@ In e-commerce, over 70–85% of users add products to their cart and leave witho
 
 ## 🏗️ System Architecture
 
-![ShopX AI System Architecture](architecture.png)
+![ShopX AI System Architecture](Architecture.png)
