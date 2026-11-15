@@ -206,37 +206,33 @@ def generate_recovery_action(row):
     prod = row['Product']
     price = row['Price'] if pd.notna(row['Price']) else 0
     factor = row['Top_SHAP_Factor']
+    cart_url = "https://shorturl.at/hvRY3"
 
     if factor in ['Price', 'Is_High_Ticket', 'Price_Share_In_Cart']:
         strategy = "No-Cost EMI + ₹1,500 Instant Discount"
-        msg = (
-            f"Hi {user}! You left {prod} (₹{price:,.0f}) in your ShopX cart. "
-            f"Unlock 0% No-Cost EMI + ₹1,500 OFF using code SHOPX1500 for the next 4 hours!"
-        )
+        offer_line = f"Unlock 0% No-Cost EMI + ₹1,500 OFF on {prod} (₹{price:,.0f}) using code SHOPX1500 for the next 4 hours!"
     elif factor in ['User_Total_Cart_Value', 'Cart_Item_Count']:
         strategy = "Bundle Deal (10% Off Multi-Item Cart)"
-        msg = (
-            f"Hey {user}! Still deciding on your ShopX cart items including {prod}? "
-            f"Complete your order today and get 10% Bundle Savings (BUNDLE10) + Free Express Delivery!"
-        )
+        offer_line = f"Complete your order for {prod} today and get 10% Bundle Savings (BUNDLE10) + Free Express Delivery!"
     elif factor == 'Auth_Friction_Count':
         strategy = "1-Click Guest Checkout Link"
-        msg = (
-            f"Hi {user}, we noticed you faced login trouble earlier while grabbing {prod}. "
-            f"Use our 1-Click Guest Checkout link to place your order in 15 seconds!"
-        )
+        offer_line = f"We noticed login trouble earlier while grabbing {prod} — use our 1-Click Guest Checkout to order in 15 seconds!"
     elif factor == 'Is_Mobile':
         strategy = "Mobile 1-Tap UPI + Free Shipping"
-        msg = (
-            f"Hi {user}! Your {prod} is saved in your ShopX bag. "
-            f"Pay seamlessly via 1-Tap UPI on mobile and get Free Priority Delivery today!"
-        )
+        offer_line = f"Pay seamlessly via 1-Tap UPI on mobile for {prod} and get Free Priority Delivery today!"
     else:
         strategy = "Low-Stock Urgency Reminder"
-        msg = (
-            f"Hi {user}, quick heads-up! {prod} in your ShopX cart is selling fast. "
-            f"Complete your checkout now before stock runs out!"
-        )
+        offer_line = f"{prod} (₹{price:,.0f}) is selling fast — grab yours before stock runs out!"
+
+    msg = (
+        f"Hi {user},\n"
+        f"You just left behind an item in your shopping cart.\n"
+        f"Don't miss the chance to get it!\n\n"
+        f"Your cart is missing you: {cart_url}\n"
+        f"{offer_line}\n\n"
+        f"If you face any issues, feel free to reach out to us with any queries.\n"
+        f"ShopX Ecommerce"
+    )
     return strategy, msg
 
 
