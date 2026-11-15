@@ -14,6 +14,91 @@ st.set_page_config(
     page_icon="🛒",
     layout="wide"
 )
+# Custom Premium Dark SaaS & Glassmorphism Theme
+st.markdown("""
+<style>
+    /* Main Animated Deep Gradient Background */
+    .stApp {
+        background: radial-gradient(circle at 10% 20%, #0f172a 0%, #090d16 45%, #111827 100%);
+        color: #f8fafc;
+    }
+
+    /* Gradient Glowing Main Title */
+    h1 {
+        background: linear-gradient(90deg, #38bdf8, #818cf8, #c084fc);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-weight: 800 !important;
+        letter-spacing: -0.5px;
+    }
+
+    /* Subheaders with Subtle Accent */
+    h2, h3 {
+        color: #e2e8f0 !important;
+        font-weight: 700 !important;
+    }
+
+    /* Glassmorphism KPI Metric Cards */
+    [data-testid="stMetric"] {
+        background: rgba(30, 41, 59, 0.55);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(56, 189, 248, 0.25);
+        border-radius: 16px;
+        padding: 18px 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+        transition: transform 0.2s ease, border-color 0.2s ease;
+    }
+    [data-testid="stMetric"]:hover {
+        transform: translateY(-4px);
+        border-color: rgba(56, 189, 248, 0.7);
+    }
+    [data-testid="stMetricLabel"] {
+        color: #94a3b8 !important;
+        font-size: 0.9rem !important;
+    }
+    [data-testid="stMetricValue"] {
+        color: #38bdf8 !important;
+        font-weight: 800 !important;
+    }
+
+    /* Sleek Action Buttons */
+    .stButton > button {
+        background: linear-gradient(135deg, #2563eb, #7c3aed);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        padding: 0.5rem 1.2rem;
+        font-weight: 600;
+        box-shadow: 0 4px 15px rgba(124, 58, 237, 0.35);
+        transition: all 0.25s ease;
+    }
+    .stButton > button:hover {
+        transform: scale(1.03);
+        box-shadow: 0 6px 20px rgba(56, 189, 248, 0.5);
+    }
+
+    /* Info Box & Text Area Styling */
+    [data-testid="stAlert"] {
+        background: rgba(15, 23, 42, 0.75) !important;
+        border: 1px solid rgba(129, 140, 248, 0.35) !important;
+        border-radius: 14px !important;
+    }
+    textarea {
+        background-color: rgba(15, 23, 42, 0.85) !important;
+        color: #f1f5f9 !important;
+        border: 1px solid rgba(148, 163, 184, 0.3) !important;
+        border-radius: 12px !important;
+    }
+
+    /* Dataframe Container */
+    [data-testid="stDataFrame"] {
+        border: 1px solid rgba(148, 163, 184, 0.2);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+</style>
+""", unsafe_allow_html=True)
 
 # 2. Config: Tumhari Live Google Sheet ID
 SHEET_ID = "1oZZ3L780Bx21aUP-nrb3d33_C9cQwsMd_mqn6AgK26g"
