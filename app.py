@@ -15,7 +15,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# 2. Config: Apni Google Sheet ID yahan paste karo (URL ke /d/ aur /edit ke beech wala hissa)
+# 2. Config: Tumhari Live Google Sheet ID
 SHEET_ID = "1oZZ3L780Bx21aUP-nrb3d33_C9cQwsMd_mqn6AgK26g"
 LOCAL_EXCEL_FILE = "Shopx Store Data.xlsx"
 
@@ -69,7 +69,7 @@ def run_ai_pipeline(df):
     if cart_df.empty:
         return pd.DataFrame()
 
-    # Map User Email from Auth/Order events for recovery contact
+    # Map User Email/Phone from Auth/Order events for recovery contact
     user_email_map = (
         df[df['Event_Type'].isin(['SIGNUP', 'LOGIN', 'ORDER_PLACED'])]
         .dropna(subset=['Email'])
@@ -103,6 +103,20 @@ def run_ai_pipeline(df):
         .fillna(cart_df['User_Name'].map(user_email_map))
         .fillna("Not Captured")
     )
+
+    # Extract Email & 10-Digit Indian Mobile Number (+91) separately
+    def extract_contact_details(contact_str):
+        text = str(contact_str)
+        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
+        email_val = email_match.group(0) if email_match else ""
+
+        phone_match = re.search(r'(?:\+91[\-\s]?|91[\-\s]?|0)?([6-9]\d{9})\b', text)
+        phone_val = f"91{phone_match.group(1)}" if phone_match else ""
+        return email_val, phone_val
+
+    extracted = cart_df['Contact_Info'].apply(extract_contact_details)
+    cart_df['Extracted_Email'] = [e[0] for e in extracted]
+    cart_df['Extracted_Phone'] = [e[1] for e in extracted]
 
     # Device mapping (Mobile vs Desktop)
     ua_map = (
@@ -304,11 +318,35 @@ try:
         )
         encoded_text = urllib.parse.quote(edited_msg)
         subject = urllib.parse.quote(f"Complete your ShopX order: {selected_row['Product'][:30]}")
-        contact = str(selected_row['Contact_Info'])
 
-        email_link = f"mailto:{contact}?subject={subject}&body={encoded_text}" if "@" in contact else "#"
-        wa_link = f"https://wa.me/?text={encoded_text}"
-        st.markdown(f"👉 **[📧 Send via Email]({email_link})** &nbsp;&nbsp;|&nbsp;&nbsp; 👉 **[💬 Send via WhatsApp]({wa_link})**")
+        user_email = str(selected_row.get('Extracted_Email', '')).strip()
+        user_phone = str(selected_row.get('Extracted_Phone', '')).strip()
+
+        # Optional manual override agar phone number sheet mein logged nahi hai
+        if not user_phone:
+            manual_num = st.text_input(
+                "📱 Phone number sheet mein nahi mila — direct WhatsApp ke liye 10-digit number daalein (Optional):",
+                placeholder="e.g. 9876543210"
+            )
+            clean_manual = re.sub(r'\D', '', manual_num)
+            if len(clean_manual) == 10:
+                user_phone = f"91{clean_manual}"
+            elif len(clean_manual) == 12 and clean_manual.startswith("91"):
+                user_phone = clean_manual
+
+        wa_link = f"https://wa.me/{user_phone}?text={encoded_text}" if user_phone else f"https://wa.me/?text={encoded_text}"
+
+        action_links = []
+        if user_email:
+            gmail_link = f"https://mail.google.com/mail/?view=cm&fs=1&to={urllib.parse.quote(user_email)}&su={subject}&body={encoded_text}"
+            action_links.append(f"👉 **[📧 Send via Gmail ({user_email})]({gmail_link})**")
+
+        if user_phone:
+            action_links.append(f"👉 **[💬 Direct WhatsApp (+{user_phone})]({wa_link})**")
+        else:
+            action_links.append(f"👉 **[💬 Open WhatsApp (Select Contact Manually)]({wa_link})**")
+
+        st.markdown(" &nbsp;&nbsp;|&nbsp;&nbsp; ".join(action_links))
 
     st.divider()
 
