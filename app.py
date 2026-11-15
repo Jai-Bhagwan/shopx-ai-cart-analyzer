@@ -20,31 +20,44 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom Bento Glassmorphism Theme
+# Custom Dribbble-Style Bento Glassmorphism Theme
 st.markdown("""
 <style>
     header[data-testid="stHeader"] {
         background: transparent !important;
     }
+
+    /* Ambient Charcoal Background with Lime-Olive & Warm Amber Glows */
     .stApp {
-        background-color: #111312;
+        background-color: #111312 !important;
         background-image: 
             radial-gradient(circle at 12% 15%, rgba(163, 217, 58, 0.14) 0%, transparent 38%),
-            radial-gradient(circle at 88% 82%, rgba(245, 158, 11, 0.11) 0%, transparent 40%),
-            radial-gradient(circle at 55% 45%, rgba(45, 212, 191, 0.07) 0%, transparent 45%);
-        color: #f3f4f6;
+            radial-gradient(circle at 88% 82%, rgba(245, 158, 11, 0.12) 0%, transparent 40%),
+            radial-gradient(circle at 55% 45%, rgba(45, 212, 191, 0.08) 0%, transparent 45%) !important;
+        color: #f3f4f6 !important;
     }
+
+    /* Make all widget labels clearly visible */
+    label, .stSelectbox label, .stTextArea label, .stTextInput label, [data-testid="stWidgetLabel"] p {
+        color: #e2e8f0 !important;
+        font-weight: 600 !important;
+        font-size: 0.9rem !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* Top Floating Glass Pill Header */
     .bento-navbar {
-        background: rgba(28, 31, 30, 0.78);
+        background: rgba(28, 31, 30, 0.75);
         backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
         border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 50px;
         padding: 12px 26px;
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-bottom: 22px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        margin-bottom: 20px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
     }
     .nav-brand {
         font-size: 1.25rem;
@@ -65,36 +78,111 @@ st.markdown("""
         border-radius: 30px;
     }
     .nav-pill {
-        background: rgba(255, 255, 255, 0.06);
+        background: rgba(255, 255, 255, 0.07);
         color: #cbd5e1;
         font-weight: 500;
         font-size: 0.8rem;
         padding: 6px 14px;
         border-radius: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.06);
     }
+
+    /* Bento Glass KPI Cards */
     [data-testid="stMetric"] {
-        background: linear-gradient(145deg, rgba(34, 38, 36, 0.78), rgba(22, 25, 24, 0.68));
+        background: linear-gradient(145deg, rgba(34, 38, 36, 0.75), rgba(22, 25, 24, 0.65));
         backdrop-filter: blur(16px);
+        -webkit-backdrop-filter: blur(16px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 24px;
-        padding: 20px 22px;
-        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.38);
+        border-radius: 22px;
+        padding: 16px 18px;
+        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
     }
-    [data-testid="stMetricLabel"] { color: #9ca3af !important; font-weight: 600 !important; }
-    [data-testid="stMetricValue"] { font-size: 2rem !important; font-weight: 800 !important; }
+    [data-testid="stMetricLabel"] p { color: #9ca3af !important; font-weight: 600 !important; font-size: 0.82rem !important; }
+    [data-testid="stMetricValue"] { font-size: 1.75rem !important; font-weight: 800 !important; }
     div[data-testid="column"]:nth-of-type(1) [data-testid="stMetricValue"] { color: #d4f34a !important; }
     div[data-testid="column"]:nth-of-type(2) [data-testid="stMetricValue"] { color: #f5b041 !important; }
     div[data-testid="column"]:nth-of-type(3) [data-testid="stMetricValue"] { color: #4ce0b3 !important; }
     div[data-testid="column"]:nth-of-type(4) [data-testid="stMetricValue"] { color: #a78bfa !important; }
+
+    /* Bento Glass Containers */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: rgba(28, 31, 30, 0.68) !important;
-        backdrop-filter: blur(16px) !important;
+        background: rgba(28, 31, 30, 0.62) !important;
+        backdrop-filter: blur(18px) !important;
+        -webkit-backdrop-filter: blur(18px) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 24px !important;
         padding: 18px !important;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
     }
-    h2, h3 { color: #f3f4f6 !important; font-weight: 700 !important; }
+
+    /* Frosted Glass Customer Details Slab (Replaces White st.info Box) */
+    .customer-glass-slab {
+        background: linear-gradient(135deg, rgba(42, 46, 44, 0.68), rgba(24, 27, 26, 0.72));
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        border-radius: 20px;
+        padding: 18px 20px;
+        margin: 12px 0 16px 0;
+        box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.08), 0 8px 24px rgba(0, 0, 0, 0.3);
+        color: #f1f5f9;
+        line-height: 1.65;
+        font-size: 0.92rem;
+    }
+    .slab-badge-lime {
+        display: inline-block;
+        background: rgba(212, 243, 74, 0.16);
+        color: #d4f34a;
+        border: 1px solid rgba(212, 243, 74, 0.35);
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-bottom: 8px;
+    }
+    .slab-badge-teal {
+        display: inline-block;
+        background: rgba(76, 224, 179, 0.16);
+        color: #4ce0b3;
+        border: 1px solid rgba(76, 224, 179, 0.35);
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 0.78rem;
+        font-weight: 700;
+        margin-left: 6px;
+    }
+
+    /* Dark Glass Selectbox & Dropdown Popup List */
+    div[data-baseweb="select"] > div {
+        background-color: rgba(22, 25, 24, 0.85) !important;
+        border: 1px solid rgba(255, 255, 255, 0.14) !important;
+        border-radius: 16px !important;
+        color: #f8fafc !important;
+    }
+    div[data-baseweb="popover"], ul[data-baseweb="menu"] {
+        background-color: rgba(24, 27, 26, 0.92) !important;
+        backdrop-filter: blur(20px) !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 16px !important;
+    }
+    ul[data-baseweb="menu"] li {
+        color: #e2e8f0 !important;
+        background-color: transparent !important;
+    }
+    ul[data-baseweb="menu"] li:hover {
+        background-color: rgba(212, 243, 74, 0.18) !important;
+        color: #d4f34a !important;
+    }
+
+    /* TextArea & TextInput */
+    textarea, input {
+        background-color: rgba(20, 22, 21, 0.82) !important;
+        color: #f8fafc !important;
+        border: 1px solid rgba(255, 255, 255, 0.12) !important;
+        border-radius: 16px !important;
+    }
+
+    /* Sync Button */
     .stButton > button {
         background: #d4f34a !important;
         color: #111312 !important;
@@ -103,18 +191,8 @@ st.markdown("""
         padding: 0.45rem 1.3rem !important;
         font-weight: 700 !important;
     }
-    [data-testid="stAlert"] {
-        background: rgba(34, 38, 36, 0.78) !important;
-        border: 1px solid rgba(76, 224, 179, 0.3) !important;
-        border-radius: 20px !important;
-        color: #e2e8f0 !important;
-    }
-    textarea, input {
-        background-color: rgba(20, 22, 21, 0.85) !important;
-        color: #f8fafc !important;
-        border: 1px solid rgba(255, 255, 255, 0.12) !important;
-        border-radius: 16px !important;
-    }
+
+    /* Pill Action Links */
     .action-btn-gmail {
         display: inline-block;
         background: #d4f34a;
@@ -124,7 +202,8 @@ st.markdown("""
         border-radius: 30px;
         text-decoration: none !important;
         margin-right: 10px;
-        font-size: 0.88rem;
+        margin-top: 8px;
+        font-size: 0.86rem;
     }
     .action-btn-wa {
         display: inline-block;
@@ -134,7 +213,8 @@ st.markdown("""
         padding: 9px 18px;
         border-radius: 30px;
         text-decoration: none !important;
-        font-size: 0.88rem;
+        margin-top: 8px;
+        font-size: 0.86rem;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -358,10 +438,11 @@ def generate_recovery_action(row):
     return strategy, msg
 
 
-# ================= UI =================
+# ================= ORGANIZED DRIBBBLE BENTO GRID UI =================
 try:
     raw_df, data_source = load_live_data(SHEET_ID)
 
+    # Top Floating Glass Pill Navbar
     st.markdown(f"""
     <div class="bento-navbar">
         <div class="nav-brand">🛒 ShopX AI Portal</div>
@@ -394,50 +475,60 @@ try:
     abandoned_df['Recommended_Action'] = [r[0] for r in recovery_results]
     abandoned_df['Recovery_Message'] = [r[1] for r in recovery_results]
 
-    col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Cart Additions", len(analyzed_df))
-    col2.metric("Abandoned Items", len(abandoned_df))
-    col3.metric("Abandonment Rate", f"{(len(abandoned_df) / len(analyzed_df)) * 100:.1f}%")
-    col4.metric("Recoverable Revenue", f"₹{abandoned_df['Price'].sum():,.0f}")
+    # Asymmetric Bento Grid: Left Analytics Zone (1.45) + Right Recovery Engine Panel (1)
+    left_bento, right_bento = st.columns([1.45, 1], gap="large")
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    with left_bento:
+        # 1. KPI Summary Strip
+        col1, col2, col3, col4 = st.columns(4)
+        col1.metric("Cart Additions", len(analyzed_df))
+        col2.metric("Abandoned", len(abandoned_df))
+        col3.metric("Drop-Off Rate", f"{(len(abandoned_df) / len(analyzed_df)) * 100:.1f}%")
+        col4.metric("At-Risk Value", f"₹{abandoned_df['Price'].sum():,.0f}")
 
-    c1, c2 = st.columns(2)
-    with c1:
+        st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+
+        # 2. Side-by-Side Analytics Bento Cards
+        c1, c2 = st.columns(2)
+        with c1:
+            with st.container(border=True):
+                st.subheader("📊 Drop-Off Root Causes (SHAP)")
+                st.bar_chart(abandoned_df['AI_Root_Cause'].value_counts(), color="#d4f34a")
+
+        with c2:
+            with st.container(border=True):
+                st.subheader("🔥 Most Abandoned Products")
+                short_prods = abandoned_df['Product'].str.slice(0, 20)
+                st.bar_chart(short_prods.value_counts().head(6), color="#4ce0b3")
+
+    with right_bento:
+        # 3. AI Cart-Recovery & Customer Details Bento Panel
         with st.container(border=True):
-            st.subheader("📊 Drop-Off Root Causes (SHAP)")
-            st.bar_chart(abandoned_df['AI_Root_Cause'].value_counts(), color="#d4f34a")
-
-    with c2:
-        with st.container(border=True):
-            st.subheader("🔥 Most Abandoned Products")
-            short_prods = abandoned_df['Product'].str.slice(0, 24)
-            st.bar_chart(short_prods.value_counts().head(6), color="#4ce0b3")
-
-    st.markdown("<br>", unsafe_allow_html=True)
-
-    with st.container(border=True):
-        st.subheader("🚀 AI Cart-Recovery Action Engine")
-        abandoned_df['Selector_Label'] = (
-            abandoned_df['User_Name'].astype(str) + " — " +
-            abandoned_df['Product'].str.slice(0, 35) +
-            " (₹" + abandoned_df['Price'].fillna(0).astype(int).astype(str) + ")"
-        )
-
-        selected_label = st.selectbox("Select an Abandoned Cart Entry:", abandoned_df['Selector_Label'].tolist())
-        selected_row = abandoned_df[abandoned_df['Selector_Label'] == selected_label].iloc[0]
-
-        r_col1, r_col2 = st.columns([1, 1.5])
-        with r_col1:
-            st.info(
-                f"**User:** {selected_row['User_Name']}\n\n"
-                f"**Contact:** {selected_row['Contact_Info']}\n\n"
-                f"**Abandon Risk Score:** {selected_row['Abandon_Risk_%']}%\n\n"
-                f"**SHAP Root Cause:** {selected_row['AI_Root_Cause']}\n\n"
-                f"**Recommended Strategy:** {selected_row['Recommended_Action']}"
+            st.subheader("🚀 AI Cart-Recovery Action Engine")
+            abandoned_df['Selector_Label'] = (
+                abandoned_df['User_Name'].astype(str) + " — " +
+                abandoned_df['Product'].str.slice(0, 32) +
+                " (₹" + abandoned_df['Price'].fillna(0).astype(int).astype(str) + ")"
             )
 
-        with r_col2:
+            selected_label = st.selectbox(
+                "Select an Abandoned Cart Entry:",
+                abandoned_df['Selector_Label'].tolist()
+            )
+            selected_row = abandoned_df[abandoned_df['Selector_Label'] == selected_label].iloc[0]
+
+            # Custom Translucent Glass Slab for Customer Details
+            st.markdown(f"""
+            <div class="customer-glass-slab">
+                <span class="slab-badge-lime">Abandon Risk: {selected_row['Abandon_Risk_%']}%</span>
+                <span class="slab-badge-teal">Customer Details</span><br>
+                <b>👤 User:</b> {selected_row['User_Name']}<br>
+                <b>📞 Contact:</b> {selected_row['Contact_Info']}<br>
+                <b>🧠 SHAP Root Cause:</b> {selected_row['AI_Root_Cause']}<br>
+                <b>🎯 Strategy:</b> {selected_row['Recommended_Action']}
+            </div>
+            """, unsafe_allow_html=True)
+
             edited_msg = st.text_area(
                 "Personalized Recovery Message (Editable):",
                 value=selected_row['Recovery_Message'],
@@ -451,7 +542,7 @@ try:
 
             if not user_phone:
                 manual_num = st.text_input(
-                    "📱 Phone number sheet mein nahi mila — direct WhatsApp ke liye 10-digit number daalein (Optional):",
+                    "📱 Enter 10-digit WhatsApp number (if not captured in sheet):",
                     placeholder="e.g. 9876543210"
                 )
                 clean_manual = re.sub(r'\D', '', manual_num)
@@ -474,8 +565,9 @@ try:
 
             st.markdown(buttons_html, unsafe_allow_html=True)
 
-    st.markdown("<br>", unsafe_allow_html=True)
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
+    # 4. Bottom Full-Width Glass Bento Table
     with st.container(border=True):
         st.subheader("🕵️ Complete Abandonment Diagnosis & Action Table")
         st.dataframe(
