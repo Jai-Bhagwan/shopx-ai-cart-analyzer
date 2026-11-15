@@ -17,20 +17,4 @@ In e-commerce, over 70–85% of users add products to their cart and leave witho
 
 ## 🏗️ System Architecture
 
-```text
-[ShopX E-Commerce Storefront]
-         │  (Real-time Webhook / Apps Script Event Logging)
-         ▼
-[Google Sheets Live Database] ──(Fallback: Shopx Store Data.xlsx)
-         │  (Auto-Fetch via CSV Export API every 60s)
-         ▼
-[Data Cleaning & Feature Engineering Pipeline (Pandas / NumPy)]
-         │
-         ▼
-[Random Forest Classifier (Scikit-Learn)] ──► Abandonment Risk Score (%)
-         │
-         ▼
-[SHAP TreeExplainer (Explainable AI)] ──► Top Root-Cause Driver ("Why")
-         │
-         ▼
-[Streamlit Interactive Dashboard & Recovery Action Engine]
+![ShopX AI System Architecture](architecture.png)
