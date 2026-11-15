@@ -77,7 +77,7 @@ st.markdown("""
         border: 1px solid rgba(255, 255, 255, 0.05);
     }
 
-    /* Bento Glass KPI Cards (Inspired by Progress Statistics Cards) */
+    /* Bento Glass KPI Cards */
     [data-testid="stMetric"] {
         background: linear-gradient(145deg, rgba(34, 38, 36, 0.78), rgba(22, 25, 24, 0.68));
         backdrop-filter: blur(16px);
@@ -190,11 +190,11 @@ LOCAL_EXCEL_FILE = "Shopx Store Data.xlsx"
 
 # 3. Data Loader (5-sec timeout + automatic local Excel fallback)
 @st.cache_data(ttl=60)
-def load_live_data(1oZZ3L780Bx21aUP-nrb3d33_C9cQwsMd_mqn6AgK26g):
+def load_live_data(sheet_id):
     df = None
     source_used = "Local Excel Backup"
 
-    if sheet_id and sheet_id != "1oZZ3L780Bx21aUP-nrb3d33_C9cQwsMd_mqn6AgK26g":
+    if sheet_id:
         try:
             url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
             resp = requests.get(url, timeout=5)
@@ -205,75 +205,4 @@ def load_live_data(1oZZ3L780Bx21aUP-nrb3d33_C9cQwsMd_mqn6AgK26g):
             st.warning(f"Live Google Sheet fetch nahi ho payi ({e}). Local Excel load kar rahe hain...")
 
     if df is None:
-        df = pd.read_excel(LOCAL_EXCEL_FILE, header=None)
-
-    df = df.iloc[:, :8].copy()
-    df.columns = [
-        'Timestamp', 'Event_Type', 'User_Name', 'Email',
-        'Details', 'Price_Raw', 'IP_Address', 'Device_Browser'
-    ]
-    df['Timestamp'] = pd.to_datetime(df['Timestamp'], errors='coerce')
-    df = df.dropna(subset=['Timestamp']).reset_index(drop=True)
-    return df, source_used
-
-
-# 4. Price Parser
-def parse_price(val):
-    if pd.isna(val) or str(val).strip() in ['—', '-', '']:
-        return np.nan
-    cleaned = re.sub(r'[₹,\s]', '', str(val))
-    try:
-        return float(cleaned)
-    except ValueError:
-        return np.nan
-
-
-# 5. ML + SHAP Root-Cause Pipeline
-def run_ai_pipeline(df):
-    df['Price'] = df['Price_Raw'].apply(parse_price)
-    cart_df = df[df['Event_Type'] == 'ADD_TO_CART'].copy()
-    order_df = df[df['Event_Type'] == 'ORDER_PLACED'].copy()
-
-    if cart_df.empty:
-        return pd.DataFrame()
-
-    user_email_map = (
-        df[df['Event_Type'].isin(['SIGNUP', 'LOGIN', 'ORDER_PLACED'])]
-        .dropna(subset=['Email'])
-        .groupby('User_Name')['Email']
-        .first()
-        .to_dict()
-    )
-
-    cart_df['Product'] = (
-        cart_df['Details']
-        .astype(str)
-        .str.replace(r'^ADDED:\s*', '', regex=True)
-        .str.replace(r'\s*\(x\d+\)$', '', regex=True)
-        .str.strip()
-    )
-    cart_df = cart_df[cart_df['Product'].str.lower() != 'nan'].copy()
-
-    def check_purchased(row):
-        user_orders = order_df[order_df['User_Name'] == row['User_Name']]
-        prefix = str(row['Product'])[:25].lower()
-        for _, o in user_orders.iterrows():
-            if prefix in str(o['Details']).lower() or (pd.notna(o['Price']) and o['Price'] == row['Price']):
-                return 1
-        return 0
-
-    cart_df['Purchased'] = cart_df.apply(check_purchased, axis=1)
-    cart_df['Contact_Info'] = (
-        cart_df['Email']
-        .fillna(cart_df['User_Name'].map(user_email_map))
-        .fillna("Not Captured")
-    )
-
-    def extract_contact_details(contact_str):
-        text = str(contact_str)
-        email_match = re.search(r'[\w\.-]+@[\w\.-]+\.\w+', text)
-        email_val = email_match.group(0) if email_match else ""
-
-        phone_match = re.search(r'(?:\+91[\-\s]?|91[\-\s]?|0)?([6-9]\d{9})\b', text)
-        phone_val = f"91{phone_match.group(1)}" if phone_match else ""
-        return email_val, phone_
+        df = pd
