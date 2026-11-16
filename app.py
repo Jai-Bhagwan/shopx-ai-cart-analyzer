@@ -115,7 +115,7 @@ st.markdown("""
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
     }
 
-    /* Frosted Glass Customer Details Slab (Replaces White st.info Box) */
+    /* Frosted Glass Customer Details Slab */
     .customer-glass-slab {
         background: linear-gradient(135deg, rgba(42, 46, 44, 0.68), rgba(24, 27, 26, 0.72));
         backdrop-filter: blur(20px);
@@ -437,12 +437,14 @@ def generate_recovery_action(row):
     )
     return strategy, msg
 
+
 # 7. Website Traffic & Conversion Analytics Engine
 def compute_traffic_analytics(df):
     total_events = len(df)
     
-    # Visit / Session events detect karna (PAGE_VIEW, VISIT, HOME, ya all unique user-day sessions)
-    visit_events = df[df['Event_Type'].astype(str).str.upper().isin(['PAGE_VIEW', 'VISIT', 'SITE_VISIT', 'VIEW_PRODUCT', 'LOGIN', 'SIGNUP'])]
+    visit_events = df[df['Event_Type'].astype(str).str.upper().isin([
+        'PAGE_VIEW', 'VISIT', 'SITE_VISIT', 'VIEW_PRODUCT', 'LOGIN', 'SIGNUP'
+    ])]
     total_visits = len(visit_events) if not visit_events.empty else total_events
     
     unique_visitors = df['User_Name'].dropna().nunique()
@@ -455,18 +457,15 @@ def compute_traffic_analytics(df):
     
     visit_to_buy_rate = (total_purchases / total_visits * 100) if total_visits > 0 else 0.0
     
-    # Daily Traffic Trend
     traffic_df = df.copy()
     traffic_df['Date'] = traffic_df['Timestamp'].dt.date
     daily_traffic = traffic_df.groupby('Date').size().rename("Website Hits")
     
-    # Event Funnel Breakdown
     funnel_data = pd.DataFrame({
-        'Stage': ['1. Total Visits / Hits', '2. Added to Cart', '3. Purchased Orders'],
-        'Users / Events': [total_visits, cart_additions, total_purchases]
+        'Stage': ['1. Total Visits', '2. Added to Cart', '3. Purchased'],
+        'Count': [total_visits, cart_additions, total_purchases]
     }).set_index('Stage')
     
-    # Device Breakdown (Mobile vs Desktop)
     device_series = df['Device_Browser'].fillna('Desktop').astype(str).apply(
         lambda x: 'Mobile' if any(k in x.lower() for k in ['mobile', 'android', 'iphone']) else 'Desktop / Web'
     ).value_counts()
@@ -613,7 +612,35 @@ try:
 
     st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
-    # 4. Bottom Full-Width Glass Bento Table
+    # 4. Website Traffic & Conversion Funnel Bento Section
+    traffic = compute_traffic_analytics(raw_df)
+
+    with st.container(border=True):
+        st.subheader("🌐 Website Traffic & Purchase Conversion Overview")
+        
+        t_col1, t_col2, t_col3, t_col4 = st.columns(4)
+        t_col1.metric("Total Website Visits", f"{traffic['total_visits']:,}", f"{traffic['unique_visitors']} Unique Users")
+        t_col2.metric("Completed Purchases", f"{traffic['total_purchases']:,}", f"₹{traffic['total_sales_rev']:,.0f} Revenue")
+        t_col3.metric("Visit-to-Buy Conversion", f"{traffic['visit_to_buy_rate']:.1f}%")
+        top_device = traffic['device_series'].index[0] if not traffic['device_series'].empty else "Web"
+        t_col4.metric("Primary Traffic Source", top_device)
+
+        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+
+        tc1, tc2, tc3 = st.columns([1.3, 1, 0.8])
+        with tc1:
+            st.markdown("**📈 Daily Website Traffic Trend**")
+            st.area_chart(traffic['daily_traffic'], color="#d4f34a")
+        with tc2:
+            st.markdown("**🎯 Visitor-to-Purchase Funnel**")
+            st.bar_chart(traffic['funnel_data'], color="#4ce0b3")
+        with tc3:
+            st.markdown("**📱 Device Traffic Split**")
+            st.bar_chart(traffic['device_series'], color="#f5b041")
+
+    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+
+    # 5. Bottom Full-Width Glass Bento Table
     with st.container(border=True):
         st.subheader("🕵️ Complete Abandonment Diagnosis & Action Table")
         st.dataframe(
