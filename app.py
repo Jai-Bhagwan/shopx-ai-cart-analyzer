@@ -437,6 +437,51 @@ def generate_recovery_action(row):
     )
     return strategy, msg
 
+# 7. Website Traffic & Conversion Analytics Engine
+def compute_traffic_analytics(df):
+    total_events = len(df)
+    
+    # Visit / Session events detect karna (PAGE_VIEW, VISIT, HOME, ya all unique user-day sessions)
+    visit_events = df[df['Event_Type'].astype(str).str.upper().isin(['PAGE_VIEW', 'VISIT', 'SITE_VISIT', 'VIEW_PRODUCT', 'LOGIN', 'SIGNUP'])]
+    total_visits = len(visit_events) if not visit_events.empty else total_events
+    
+    unique_visitors = df['User_Name'].dropna().nunique()
+    cart_additions = len(df[df['Event_Type'] == 'ADD_TO_CART'])
+    orders_df = df[df['Event_Type'] == 'ORDER_PLACED'].copy()
+    total_purchases = len(orders_df)
+    
+    orders_df['Order_Val'] = orders_df['Price_Raw'].apply(parse_price)
+    total_sales_rev = orders_df['Order_Val'].sum() if not orders_df.empty else 0.0
+    
+    visit_to_buy_rate = (total_purchases / total_visits * 100) if total_visits > 0 else 0.0
+    
+    # Daily Traffic Trend
+    traffic_df = df.copy()
+    traffic_df['Date'] = traffic_df['Timestamp'].dt.date
+    daily_traffic = traffic_df.groupby('Date').size().rename("Website Hits")
+    
+    # Event Funnel Breakdown
+    funnel_data = pd.DataFrame({
+        'Stage': ['1. Total Visits / Hits', '2. Added to Cart', '3. Purchased Orders'],
+        'Users / Events': [total_visits, cart_additions, total_purchases]
+    }).set_index('Stage')
+    
+    # Device Breakdown (Mobile vs Desktop)
+    device_series = df['Device_Browser'].fillna('Desktop').astype(str).apply(
+        lambda x: 'Mobile' if any(k in x.lower() for k in ['mobile', 'android', 'iphone']) else 'Desktop / Web'
+    ).value_counts()
+
+    return {
+        'total_visits': total_visits,
+        'unique_visitors': unique_visitors,
+        'total_purchases': total_purchases,
+        'total_sales_rev': total_sales_rev,
+        'visit_to_buy_rate': visit_to_buy_rate,
+        'daily_traffic': daily_traffic,
+        'funnel_data': funnel_data,
+        'device_series': device_series
+    }
+
 
 # ================= ORGANIZED DRIBBBLE BENTO GRID UI =================
 try:
