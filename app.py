@@ -15,10 +15,14 @@ except Exception:
 
 # 1. Page Setup
 st.set_page_config(
-    page_title="ShopX AI — Cart Abandonment & Recovery Engine",
+    page_title="ShopX AI — Cart Abandonment & Traffic Intelligence",
     page_icon="🛒",
     layout="wide"
 )
+
+# Active Tab State Management
+if "active_tab" not in st.session_state:
+    st.session_state.active_tab = "dashboard"
 
 # Custom Dribbble-Style Bento Glassmorphism Theme
 st.markdown("""
@@ -45,60 +49,78 @@ st.markdown("""
         margin-bottom: 6px !important;
     }
 
-    /* Top Floating Glass Pill Header */
-    .bento-navbar {
-        background: rgba(28, 31, 30, 0.75);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
+    /* Top Floating Glass Pill Header Container */
+    .bento-nav-shell {
+        background: rgba(28, 31, 30, 0.78);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
         border: 1px solid rgba(255, 255, 255, 0.09);
         border-radius: 50px;
-        padding: 12px 26px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 20px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
+        padding: 10px 24px;
+        margin-bottom: 18px;
+        box-shadow: 0 12px 32px rgba(0, 0, 0, 0.45);
     }
     .nav-brand {
         font-size: 1.25rem;
         font-weight: 800;
         color: #ffffff;
+        padding-top: 4px;
     }
-    .nav-pills {
+    .nav-status-group {
         display: flex;
-        gap: 10px;
+        justify-content: flex-end;
+        gap: 8px;
         flex-wrap: wrap;
+        padding-top: 3px;
     }
-    .nav-pill-active {
-        background: #d4f34a;
-        color: #111312;
-        font-weight: 700;
-        font-size: 0.8rem;
-        padding: 6px 16px;
-        border-radius: 30px;
-    }
-    .nav-pill {
+    .nav-pill-info {
         background: rgba(255, 255, 255, 0.07);
         color: #cbd5e1;
         font-weight: 500;
-        font-size: 0.8rem;
-        padding: 6px 14px;
+        font-size: 0.78rem;
+        padding: 6px 13px;
         border-radius: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.06);
+        border: 1px solid rgba(255, 255, 255, 0.07);
+    }
+
+    /* Navigation Pill Buttons Styling */
+    div[data-testid="stButton"] > button[kind="primary"] {
+        background: #d4f34a !important;
+        color: #111312 !important;
+        border: none !important;
+        border-radius: 30px !important;
+        font-weight: 700 !important;
+        font-size: 0.84rem !important;
+        padding: 0.42rem 1.1rem !important;
+        box-shadow: 0 4px 14px rgba(212, 243, 74, 0.25) !important;
+    }
+    div[data-testid="stButton"] > button[kind="secondary"] {
+        background: rgba(255, 255, 255, 0.06) !important;
+        color: #e2e8f0 !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        border-radius: 30px !important;
+        font-weight: 600 !important;
+        font-size: 0.84rem !important;
+        padding: 0.42rem 1.1rem !important;
+        transition: all 0.2s ease !important;
+    }
+    div[data-testid="stButton"] > button[kind="secondary"]:hover {
+        border-color: rgba(212, 243, 74, 0.5) !important;
+        color: #d4f34a !important;
     }
 
     /* Bento Glass KPI Cards */
     [data-testid="stMetric"] {
-        background: linear-gradient(145deg, rgba(34, 38, 36, 0.75), rgba(22, 25, 24, 0.65));
-        backdrop-filter: blur(16px);
-        -webkit-backdrop-filter: blur(16px);
+        background: linear-gradient(145deg, rgba(34, 38, 36, 0.76), rgba(22, 25, 24, 0.66));
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
         border: 1px solid rgba(255, 255, 255, 0.08);
-        border-radius: 22px;
-        padding: 16px 18px;
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.35);
+        border-radius: 24px;
+        padding: 20px 22px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
     }
-    [data-testid="stMetricLabel"] p { color: #9ca3af !important; font-weight: 600 !important; font-size: 0.82rem !important; }
-    [data-testid="stMetricValue"] { font-size: 1.75rem !important; font-weight: 800 !important; }
+    [data-testid="stMetricLabel"] p { color: #9ca3af !important; font-weight: 600 !important; font-size: 0.85rem !important; }
+    [data-testid="stMetricValue"] { font-size: 1.9rem !important; font-weight: 800 !important; }
     div[data-testid="column"]:nth-of-type(1) [data-testid="stMetricValue"] { color: #d4f34a !important; }
     div[data-testid="column"]:nth-of-type(2) [data-testid="stMetricValue"] { color: #f5b041 !important; }
     div[data-testid="column"]:nth-of-type(3) [data-testid="stMetricValue"] { color: #4ce0b3 !important; }
@@ -106,12 +128,12 @@ st.markdown("""
 
     /* Bento Glass Containers */
     [data-testid="stVerticalBlockBorderWrapper"] {
-        background: rgba(28, 31, 30, 0.62) !important;
+        background: rgba(28, 31, 30, 0.64) !important;
         backdrop-filter: blur(18px) !important;
         -webkit-backdrop-filter: blur(18px) !important;
         border: 1px solid rgba(255, 255, 255, 0.08) !important;
         border-radius: 24px !important;
-        padding: 18px !important;
+        padding: 22px !important;
         box-shadow: 0 12px 32px rgba(0, 0, 0, 0.35) !important;
     }
 
@@ -180,16 +202,6 @@ st.markdown("""
         color: #f8fafc !important;
         border: 1px solid rgba(255, 255, 255, 0.12) !important;
         border-radius: 16px !important;
-    }
-
-    /* Sync Button */
-    .stButton > button {
-        background: #d4f34a !important;
-        color: #111312 !important;
-        border: none !important;
-        border-radius: 30px !important;
-        padding: 0.45rem 1.3rem !important;
-        font-weight: 700 !important;
     }
 
     /* Pill Action Links */
@@ -441,31 +453,29 @@ def generate_recovery_action(row):
 # 7. Website Traffic & Conversion Analytics Engine
 def compute_traffic_analytics(df):
     total_events = len(df)
-    
     visit_events = df[df['Event_Type'].astype(str).str.upper().isin([
         'PAGE_VIEW', 'VISIT', 'SITE_VISIT', 'VIEW_PRODUCT', 'LOGIN', 'SIGNUP'
     ])]
     total_visits = len(visit_events) if not visit_events.empty else total_events
-    
     unique_visitors = df['User_Name'].dropna().nunique()
     cart_additions = len(df[df['Event_Type'] == 'ADD_TO_CART'])
+
     orders_df = df[df['Event_Type'] == 'ORDER_PLACED'].copy()
     total_purchases = len(orders_df)
-    
     orders_df['Order_Val'] = orders_df['Price_Raw'].apply(parse_price)
     total_sales_rev = orders_df['Order_Val'].sum() if not orders_df.empty else 0.0
-    
+
     visit_to_buy_rate = (total_purchases / total_visits * 100) if total_visits > 0 else 0.0
-    
+
     traffic_df = df.copy()
     traffic_df['Date'] = traffic_df['Timestamp'].dt.date
-    daily_traffic = traffic_df.groupby('Date').size().rename("Website Hits")
-    
+    daily_traffic = traffic_df.groupby('Date').size().rename("Website Visits")
+
     funnel_data = pd.DataFrame({
         'Stage': ['1. Total Visits', '2. Added to Cart', '3. Purchased'],
-        'Count': [total_visits, cart_additions, total_purchases]
+        'Users / Events': [total_visits, cart_additions, total_purchases]
     }).set_index('Stage')
-    
+
     device_series = df['Device_Browser'].fillna('Desktop').astype(str).apply(
         lambda x: 'Mobile' if any(k in x.lower() for k in ['mobile', 'android', 'iphone']) else 'Desktop / Web'
     ).value_counts()
@@ -473,6 +483,7 @@ def compute_traffic_analytics(df):
     return {
         'total_visits': total_visits,
         'unique_visitors': unique_visitors,
+        'cart_additions': cart_additions,
         'total_purchases': total_purchases,
         'total_sales_rev': total_sales_rev,
         'visit_to_buy_rate': visit_to_buy_rate,
@@ -482,174 +493,209 @@ def compute_traffic_analytics(df):
     }
 
 
-# ================= ORGANIZED DRIBBBLE BENTO GRID UI =================
+# ================= MAIN APPLICATION =================
 try:
     raw_df, data_source = load_live_data(SHEET_ID)
 
-    # Top Floating Glass Pill Navbar
-    st.markdown(f"""
-    <div class="bento-navbar">
-        <div class="nav-brand">🛒 ShopX AI Portal</div>
-        <div class="nav-pills">
-            <span class="nav-pill-active">Dashboard</span>
-            <span class="nav-pill">Source: {data_source}</span>
-            <span class="nav-pill">Events: {len(raw_df)}</span>
-            <span class="nav-pill">Random Forest + SHAP XAI</span>
+    # Top Interactive Pill Navigation Bar
+    st.markdown('<div class="bento-nav-shell">', unsafe_allow_html=True)
+    nav_brand_col, nav_tab1_col, nav_tab2_col, nav_sync_col, nav_status_col = st.columns([1.6, 1.05, 1.75, 1.0, 2.4])
+
+    with nav_brand_col:
+        st.markdown('<div class="nav-brand">🛒 ShopX AI Portal</div>', unsafe_allow_html=True)
+
+    with nav_tab1_col:
+        if st.button(
+            "📊 Dashboard",
+            type="primary" if st.session_state.active_tab == "dashboard" else "secondary",
+            use_container_width=True
+        ):
+            st.session_state.active_tab = "dashboard"
+            st.rerun()
+
+    with nav_tab2_col:
+        if st.button(
+            "🌐 Traffic & Conversion Overview",
+            type="primary" if st.session_state.active_tab == "traffic" else "secondary",
+            use_container_width=True
+        ):
+            st.session_state.active_tab = "traffic"
+            st.rerun()
+
+    with nav_sync_col:
+        if st.button("🔄 Sync Data", type="secondary", use_container_width=True):
+            st.cache_data.clear()
+            st.rerun()
+
+    with nav_status_col:
+        st.markdown(f"""
+        <div class="nav-status-group">
+            <span class="nav-pill-info">Source: {data_source}</span>
+            <span class="nav-pill-info">Events: {len(raw_df)}</span>
+            <span class="nav-pill-info">RF + SHAP XAI</span>
         </div>
-    </div>
-    """, unsafe_allow_html=True)
+        """, unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
-    if st.button("🔄 Sync Live Data"):
-        st.cache_data.clear()
-        st.rerun()
+    # ==================== VIEW 1: CART ABANDONMENT DASHBOARD ====================
+    if st.session_state.active_tab == "dashboard":
+        analyzed_df = run_ai_pipeline(raw_df)
 
-    analyzed_df = run_ai_pipeline(raw_df)
+        if analyzed_df.empty:
+            st.warning("Abhi sheet mein koi ADD_TO_CART event nahi mila.")
+            st.stop()
 
-    if analyzed_df.empty:
-        st.warning("Abhi sheet mein koi ADD_TO_CART event nahi mila.")
-        st.stop()
+        abandoned_df = (
+            analyzed_df[analyzed_df['Purchased'] == 0]
+            .sort_values(by='Timestamp', ascending=False)
+            .copy()
+        )
 
-    abandoned_df = (
-        analyzed_df[analyzed_df['Purchased'] == 0]
-        .sort_values(by='Timestamp', ascending=False)
-        .copy()
-    )
+        recovery_results = abandoned_df.apply(generate_recovery_action, axis=1)
+        abandoned_df['Recommended_Action'] = [r[0] for r in recovery_results]
+        abandoned_df['Recovery_Message'] = [r[1] for r in recovery_results]
 
-    recovery_results = abandoned_df.apply(generate_recovery_action, axis=1)
-    abandoned_df['Recommended_Action'] = [r[0] for r in recovery_results]
-    abandoned_df['Recovery_Message'] = [r[1] for r in recovery_results]
+        left_bento, right_bento = st.columns([1.45, 1], gap="large")
 
-    # Asymmetric Bento Grid: Left Analytics Zone (1.45) + Right Recovery Engine Panel (1)
-    left_bento, right_bento = st.columns([1.45, 1], gap="large")
+        with left_bento:
+            col1, col2, col3, col4 = st.columns(4)
+            col1.metric("Cart Additions", len(analyzed_df))
+            col2.metric("Abandoned", len(abandoned_df))
+            col3.metric("Drop-Off Rate", f"{(len(abandoned_df) / len(analyzed_df)) * 100:.1f}%")
+            at_risk_millions = abandoned_df['Price'].sum() / 1_000_000
+            col4.metric("At-Risk Value", f"₹{at_risk_millions:.2f}M")
 
-    with left_bento:
-        # 1. KPI Summary Strip
-        col1, col2, col3, col4 = st.columns(4)
-        col1.metric("Cart Additions", len(analyzed_df))
-        col2.metric("Abandoned", len(abandoned_df))
-        col3.metric("Drop-Off Rate", f"{(len(abandoned_df) / len(analyzed_df)) * 100:.1f}%")
-        at_risk_millions = abandoned_df['Price'].sum() / 1_000_000
-        col4.metric("At-Risk Value", f"₹{at_risk_millions:.2f}M")
+            st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
 
-        st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+            c1, c2 = st.columns(2)
+            with c1:
+                with st.container(border=True):
+                    st.subheader("📊 Drop-Off Root Causes (SHAP)")
+                    st.bar_chart(abandoned_df['AI_Root_Cause'].value_counts(), color="#d4f34a", height=320)
 
-        # 2. Side-by-Side Analytics Bento Cards
-        c1, c2 = st.columns(2)
-        with c1:
+            with c2:
+                with st.container(border=True):
+                    st.subheader("🔥 Most Abandoned Products")
+                    short_prods = abandoned_df['Product'].str.slice(0, 20)
+                    st.bar_chart(short_prods.value_counts().head(6), color="#4ce0b3", height=320)
+
+        with right_bento:
             with st.container(border=True):
-                st.subheader("📊 Drop-Off Root Causes (SHAP)")
-                st.bar_chart(abandoned_df['AI_Root_Cause'].value_counts(), color="#d4f34a")
-
-        with c2:
-            with st.container(border=True):
-                st.subheader("🔥 Most Abandoned Products")
-                short_prods = abandoned_df['Product'].str.slice(0, 20)
-                st.bar_chart(short_prods.value_counts().head(6), color="#4ce0b3")
-
-    with right_bento:
-        # 3. AI Cart-Recovery & Customer Details Bento Panel
-        with st.container(border=True):
-            st.subheader("🚀 AI Cart-Recovery Action Engine")
-            abandoned_df['Selector_Label'] = (
-                abandoned_df['User_Name'].astype(str) + " — " +
-                abandoned_df['Product'].str.slice(0, 32) +
-                " (₹" + abandoned_df['Price'].fillna(0).astype(int).astype(str) + ")"
-            )
-
-            selected_label = st.selectbox(
-                "Select an Abandoned Cart Entry:",
-                abandoned_df['Selector_Label'].tolist()
-            )
-            selected_row = abandoned_df[abandoned_df['Selector_Label'] == selected_label].iloc[0]
-
-            # Custom Translucent Glass Slab for Customer Details
-            st.markdown(f"""
-            <div class="customer-glass-slab">
-                <span class="slab-badge-lime">Abandon Risk: {selected_row['Abandon_Risk_%']}%</span>
-                <span class="slab-badge-teal">Customer Details</span><br>
-                <b>👤 User:</b> {selected_row['User_Name']}<br>
-                <b>📞 Contact:</b> {selected_row['Contact_Info']}<br>
-                <b>🧠 SHAP Root Cause:</b> {selected_row['AI_Root_Cause']}<br>
-                <b>🎯 Strategy:</b> {selected_row['Recommended_Action']}
-            </div>
-            """, unsafe_allow_html=True)
-
-            edited_msg = st.text_area(
-                "Personalized Recovery Message (Editable):",
-                value=selected_row['Recovery_Message'],
-                height=165
-            )
-            encoded_text = urllib.parse.quote(edited_msg)
-            subject = urllib.parse.quote(f"Complete your ShopX order: {selected_row['Product'][:30]}")
-
-            user_email = str(selected_row.get('Extracted_Email', '')).strip()
-            user_phone = str(selected_row.get('Extracted_Phone', '')).strip()
-
-            if not user_phone:
-                manual_num = st.text_input(
-                    "📱 Enter 10-digit WhatsApp number (if not captured in sheet):",
-                    placeholder="e.g. 9876543210"
+                st.subheader("🚀 AI Cart-Recovery Action Engine")
+                abandoned_df['Selector_Label'] = (
+                    abandoned_df['User_Name'].astype(str) + " — " +
+                    abandoned_df['Product'].str.slice(0, 32) +
+                    " (₹" + abandoned_df['Price'].fillna(0).astype(int).astype(str) + ")"
                 )
-                clean_manual = re.sub(r'\D', '', manual_num)
-                if len(clean_manual) == 10:
-                    user_phone = f"91{clean_manual}"
-                elif len(clean_manual) == 12 and clean_manual.startswith("91"):
-                    user_phone = clean_manual
 
-            wa_link = f"https://wa.me/{user_phone}?text={encoded_text}" if user_phone else f"https://wa.me/?text={encoded_text}"
+                selected_label = st.selectbox(
+                    "Select an Abandoned Cart Entry:",
+                    abandoned_df['Selector_Label'].tolist()
+                )
+                selected_row = abandoned_df[abandoned_df['Selector_Label'] == selected_label].iloc[0]
 
-            buttons_html = ""
-            if user_email:
-                gmail_link = f"https://mail.google.com/mail/?view=cm&fs=1&to={urllib.parse.quote(user_email)}&su={subject}&body={encoded_text}"
-                buttons_html += f'<a href="{gmail_link}" target="_blank" class="action-btn-gmail">📧 Send via Gmail ({user_email})</a>'
+                st.markdown(f"""
+                <div class="customer-glass-slab">
+                    <span class="slab-badge-lime">Abandon Risk: {selected_row['Abandon_Risk_%']}%</span>
+                    <span class="slab-badge-teal">Customer Details</span><br>
+                    <b>👤 User:</b> {selected_row['User_Name']}<br>
+                    <b>📞 Contact:</b> {selected_row['Contact_Info']}<br>
+                    <b>🧠 SHAP Root Cause:</b> {selected_row['AI_Root_Cause']}<br>
+                    <b>🎯 Strategy:</b> {selected_row['Recommended_Action']}
+                </div>
+                """, unsafe_allow_html=True)
 
-            if user_phone:
-                buttons_html += f'<a href="{wa_link}" target="_blank" class="action-btn-wa">💬 Direct WhatsApp (+{user_phone})</a>'
-            else:
-                buttons_html += f'<a href="{wa_link}" target="_blank" class="action-btn-wa">💬 Open WhatsApp</a>'
+                edited_msg = st.text_area(
+                    "Personalized Recovery Message (Editable):",
+                    value=selected_row['Recovery_Message'],
+                    height=165
+                )
+                encoded_text = urllib.parse.quote(edited_msg)
+                subject = urllib.parse.quote(f"Complete your ShopX order: {selected_row['Product'][:30]}")
 
-            st.markdown(buttons_html, unsafe_allow_html=True)
+                user_email = str(selected_row.get('Extracted_Email', '')).strip()
+                user_phone = str(selected_row.get('Extracted_Phone', '')).strip()
 
-    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+                if not user_phone:
+                    manual_num = st.text_input(
+                        "📱 Enter 10-digit WhatsApp number (if not captured in sheet):",
+                        placeholder="e.g. 9876543210"
+                    )
+                    clean_manual = re.sub(r'\D', '', manual_num)
+                    if len(clean_manual) == 10:
+                        user_phone = f"91{clean_manual}"
+                    elif len(clean_manual) == 12 and clean_manual.startswith("91"):
+                        user_phone = clean_manual
 
-    # 4. Website Traffic & Conversion Funnel Bento Section
-    traffic = compute_traffic_analytics(raw_df)
+                wa_link = f"https://wa.me/{user_phone}?text={encoded_text}" if user_phone else f"https://wa.me/?text={encoded_text}"
 
-    with st.container(border=True):
-        st.subheader("🌐 Website Traffic & Purchase Conversion Overview")
-        
-        t_col1, t_col2, t_col3, t_col4 = st.columns(4)
+                buttons_html = ""
+                if user_email:
+                    gmail_link = f"https://mail.google.com/mail/?view=cm&fs=1&to={urllib.parse.quote(user_email)}&su={subject}&body={encoded_text}"
+                    buttons_html += f'<a href="{gmail_link}" target="_blank" class="action-btn-gmail">📧 Send via Gmail ({user_email})</a>'
+
+                if user_phone:
+                    buttons_html += f'<a href="{wa_link}" target="_blank" class="action-btn-wa">💬 Direct WhatsApp (+{user_phone})</a>'
+                else:
+                    buttons_html += f'<a href="{wa_link}" target="_blank" class="action-btn-wa">💬 Open WhatsApp</a>'
+
+                st.markdown(buttons_html, unsafe_allow_html=True)
+
+        st.markdown("<div style='height:16px;'></div>", unsafe_allow_html=True)
+
+        with st.container(border=True):
+            st.subheader("🕵️ Complete Abandonment Diagnosis & Action Table")
+            st.dataframe(
+                abandoned_df[[
+                    'Timestamp', 'User_Name', 'Contact_Info', 'Product',
+                    'Price', 'Abandon_Risk_%', 'AI_Root_Cause', 'Recommended_Action'
+                ]],
+                use_container_width=True
+            )
+
+    # ==================== VIEW 2: TRAFFIC & PURCHASE CONVERSION OVERVIEW ====================
+    elif st.session_state.active_tab == "traffic":
+        traffic = compute_traffic_analytics(raw_df)
+
+        st.markdown("### 🌐 Website Traffic & Purchase Conversion Overview")
+        st.markdown("<div style='height:8px;'></div>", unsafe_allow_html=True)
+
+        # Row 1: 4 Spacious Bento KPI Cards
+        t_col1, t_col2, t_col3, t_col4 = st.columns(4, gap="medium")
         t_col1.metric("Total Website Visits", f"{traffic['total_visits']:,}", f"{traffic['unique_visitors']} Unique Users")
         t_col2.metric("Completed Purchases", f"{traffic['total_purchases']:,}", f"₹{traffic['total_sales_rev']:,.0f} Revenue")
-        t_col3.metric("Visit-to-Buy Conversion", f"{traffic['visit_to_buy_rate']:.1f}%")
+        t_col3.metric("Visit-to-Buy Conversion", f"{traffic['visit_to_buy_rate']:.1f}%", f"{traffic['cart_additions']} Cart Adds")
         top_device = traffic['device_series'].index[0] if not traffic['device_series'].empty else "Web"
-        t_col4.metric("Primary Traffic Source", top_device)
+        t_col4.metric("Primary Traffic Source", top_device, "Live Telemetry")
 
-        st.markdown("<div style='height:12px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:18px;'></div>", unsafe_allow_html=True)
 
-        tc1, tc2, tc3 = st.columns([1.3, 1, 0.8])
+        # Row 2: Wide Bento Charts Layout (Matching Your 2nd Screenshot + Expanded Height)
+        tc1, tc2, tc3 = st.columns([1.45, 1.05, 0.85], gap="large")
         with tc1:
-            st.markdown("**📈 Daily Website Traffic Trend**")
-            st.area_chart(traffic['daily_traffic'], color="#d4f34a")
+            with st.container(border=True):
+                st.subheader("📈 Daily Website Traffic Trend")
+                st.area_chart(traffic['daily_traffic'], color="#d4f34a", height=360)
+
         with tc2:
-            st.markdown("**🎯 Visitor-to-Purchase Funnel**")
-            st.bar_chart(traffic['funnel_data'], color="#4ce0b3")
+            with st.container(border=True):
+                st.subheader("🎯 Visitor-to-Purchase Funnel")
+                st.bar_chart(traffic['funnel_data'], color="#4ce0b3", height=360)
+
         with tc3:
-            st.markdown("**📱 Device Traffic Split**")
-            st.bar_chart(traffic['device_series'], color="#f5b041")
+            with st.container(border=True):
+                st.subheader("📱 Device Traffic Split")
+                st.bar_chart(traffic['device_series'], color="#f5b041", height=360)
 
-    st.markdown("<div style='height:14px;'></div>", unsafe_allow_html=True)
+        st.markdown("<div style='height:18px;'></div>", unsafe_allow_html=True)
 
-    # 5. Bottom Full-Width Glass Bento Table
-    with st.container(border=True):
-        st.subheader("🕵️ Complete Abandonment Diagnosis & Action Table")
-        st.dataframe(
-            abandoned_df[[
-                'Timestamp', 'User_Name', 'Contact_Info', 'Product',
-                'Price', 'Abandon_Risk_%', 'AI_Root_Cause', 'Recommended_Action'
-            ]],
-            use_container_width=True
-        )
+        # Row 3: Live Visitor & Order Activity Feed
+        with st.container(border=True):
+            st.subheader("🧾 Recent Storefront Traffic & Purchase Activity Log")
+            recent_activity = raw_df.sort_values(by='Timestamp', ascending=False)[
+                ['Timestamp', 'Event_Type', 'User_Name', 'Details', 'Price_Raw', 'Device_Browser']
+            ].head(25)
+            st.dataframe(recent_activity, use_container_width=True, height=320)
 
 except Exception as main_err:
     st.error("App run karte waqt ek error aaya:")
